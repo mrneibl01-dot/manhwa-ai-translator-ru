@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Manhwa AI Translator RU</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      width: 356px;
+      margin: 0;
+      padding: 13px;
+      background: #0f172a;
+      color: #f1f5f9;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 13px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #38bdf8;
+      white-space: nowrap;
+    }
+    .badge-ver {
+      font-size: 10px;
+      background: linear-gradient(135deg, #0284c7, #0ea5e9);
+      color: #ffffff;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .domain-pill {
+      font-size: 11px;
+      color: #94a3b8;
+      background: #1e293b;
+      padding: 3px 7px;
+      border-radius: 999px;
+      max-width: 112px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-guide-toggle {
+      flex: none;
+      background: rgba(56, 189, 248, 0.14);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-guide-toggle:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 9px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .main-toggle-label {
+      font-weight: 600;
+      font-size: 13.5px;
+    }
+    .sub {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #475569;
+      border-radius: 999px;
+      transition: 0.2s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    input:checked + .slider { background: #0ea5e9; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #cbd5e1;
+    }
+    input[type="password"], input[type="text"], textarea, select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 7px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 12.5px;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #38bdf8;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary {
+      background: #0284c7;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-snip {
+      width: 100%;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      color: #ffffff;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 9px;
+    }
+    .btn-snip:hover { background: linear-gradient(135deg, #0369a1, #0891b2); }
+    .btn-secondary {
+      background: #334155;
+      color: #e2e8f0;
+    }
+    .btn-secondary:hover { background: #475569; }
+    .key-links-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      gap: 8px;
+    }
+    .key-link {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 11.5px;
+    }
+    .key-link:hover { text-decoration: underline; }
+    .first-run-hint {
+      display: none;
+      font-size: 11px;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.30);
+      border-radius: 7px;
+      padding: 6px 8px;
+      margin-bottom: 9px;
+      line-height: 1.35;
+    }
+    .first-run-hint a {
+      color: #38bdf8;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .status-msg {
+      margin-top: 7px;
+      font-size: 11.5px;
+      min-height: 15px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .status-ok { color: #4ade80; }
+    .status-err { color: #f87171; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 7px;
+      font-size: 12.5px;
+      gap: 8px;
+    }
+    .check-row:first-child { margin-top: 0; }
+    .check-row span { cursor: help; }
+    .range-row { margin-top: 9px; }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #38bdf8;
+    }
+    .hotkeys {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .hotkeys kbd {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #e2e8f0;
+      font-family: monospace;
+    }
+
+    /* ======================================================
+       COMPACT BUILT-IN GUIDE VIEW (ZERO SPACE WHEN CLOSED)
+       ====================================================== */
+    #guideView {
+      display: none;
+      max-height: 510px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    #guideView::-webkit-scrollbar { width: 5px; }
+    #guideView::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+
+    .guide-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .guide-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .btn-back {
+      flex: none;
+      background: #334155;
+      color: #f8fafc;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .btn-back:hover { background: #475569; }
+
+    details.guide-acc {
+      background: #1e293b;
+      border-radius: 9px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      overflow: hidden;
+    }
+    details.guide-acc[open] {
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+    details.guide-acc summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 9px 11px;
+      font-weight: 700;
+      font-size: 12.5px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    details.guide-acc summary::-webkit-details-marker { display: none; }
+    details.guide-acc summary::after {
+      content: "▾";
+      color: #38bdf8;
+      font-size: 12px;
+      transition: transform 0.15s;
+    }
+    details.guide-acc[open] summary::after {
+      transform: rotate(180deg);
+    }
+    .guide-body {
+      padding: 0 11px 10px 11px;
+      font-size: 11.8px;
+      line-height: 1.48;
+      color: #cbd5e1;
+      border-top: 1px solid rgba(148, 163, 184, 0.10);
+      padding-top: 8px;
+    }
+    .guide-body ol, .guide-body ul {
+      margin: 0;
+      padding-left: 16px;
+    }
+    .guide-body li {
+      margin-bottom: 5px;
+    }
+    .guide-body li:last-child { margin-bottom: 0; }
+    .guide-body strong { color: #f8fafc; }
+    .guide-body kbd {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #7dd3fc;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .guide-item {
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.14);
+    }
+    .guide-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .guide-item b {
+      color: #7dd3fc;
+      display: block;
+      margin-bottom: 1px;
+    }
+    .safe-box {
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      border-radius: 7px;
+      padding: 7px 9px;
+      color: #bbf7d0;
+    }
+  </style>
+</head>
+<body>
+  <!-- ==================== MAIN COMPACT PANEL ==================== -->
+  <div id="mainView">
+    <div class="header">
+      <div class="header-left">
+        <div class="title">Manhwa AI → RU</div>
+        <span class="badge-ver">v5.2</span>
+      </div>
+      <div class="header-right">
+        <div class="domain-pill" id="domainName">сайт...</div>
+        <button type="button" class="btn-guide-toggle" id="openGuideBtn" title="Открыть пошаговый гайд и описание всех функций">? Гайд</button>
+      </div>
+    </div>
+
+    <div class="first-run-hint" id="firstRunHint">
+      Впервые здесь? Откройте <a id="openGuideInline">пошаговый гайд (1 минута)</a> — там показано, где взять бесплатный ключ и как всё работает.
+    </div>
+
+    <button class="btn-snip" id="snipNowBtn" title="Выделите мышкой любой фрагмент экрана — перевод появится прямо поверх него за 1–2 секунды">✂ Обрезать и перевести область (1–2 сек)</button>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="main-toggle-label">Автоперевод этого сайта</div>
+          <div class="sub">Работает только на включённых сайтах</div>
+        </div>
+        <label class="switch" title="Включить или выключить автоматический перевод для текущего сайта">
+          <input type="checkbox" id="siteEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label" for="apiKey">Бесплатные ключи Gemini API <span style="font-weight:400;color:#94a3b8;">(1 или несколько, по 1 на строку)</span></label>
+      <textarea id="apiKey" rows="2" style="resize:vertical;font-family:monospace;font-size:11px;" placeholder="Вставьте ключ из Google AI Studio (можно 2–5 ключей с новой строки — при лимите сами переключатся)"></textarea>
+      <div class="key-links-row">
+        <a class="key-link" href="https://aistudio.google.com/apikey" target="_blank">
+          → Получить бесплатный ключ (Google AI Studio)
+        </a>
+      </div>
+
+      <div style="margin-top: 8px;">
+        <label class="field-label" for="model">Нейросеть (Flash-Lite — самая быстрая)</label>
+        <select id="model" title="Выберите модель Gemini: Flash-Lite отвечает быстрее всех, обычная Flash чуть богаче по слогу">
+          <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (самая быстрая, 1–2 сек)</option>
+          <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
+          <option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="saveTestBtn">Сохранить и проверить</button>
+      </div>
+      <div class="status-msg" id="statusMsg"></div>
+    </div>
+
+    <div class="card">
+      <div class="check-row">
+        <span title="Пока вы читаете 1-ю страницу, расширение в фоне заранее переводит всю главу целиком">🚀 Переводить всю главу заранее в фоне</span>
+        <input type="checkbox" id="preloadChapter" checked>
+      </div>
+      <div class="check-row">
+        <span title="Объединяет по 3–4 страницы в один запрос к нейросети — экономит дневной лимит в 4 раза и ускоряет работу">⚡ Пакетный турбо-режим (3–4 стр. за 1 запрос)</span>
+        <input type="checkbox" id="turboMode" checked>
+      </div>
+      <div class="check-row">
+        <span title="Полупрозрачная кнопка ✂ справа на экране для быстрого вырезания области и доперевода экрана">✂ Боковая кнопка справа на экране</span>
+        <input type="checkbox" id="showSideButton" checked>
+      </div>
+      <div class="check-row">
+        <span title="Не переводит рисованные звуковые эффекты вроде KRRACK, BOOM, WHOOSH, чтобы не портить арт">Пропускать только звуки (KRRACK, BOOM)</span>
+        <input type="checkbox" id="skipSfx" checked>
+      </div>
+      <div class="check-row">
+        <span title="Делает плавный мягкий переход от русской плашки к фону облачка">Мягкие края баблов</span>
+        <input type="checkbox" id="softEdges" checked>
+      </div>
+      <div class="check-row">
+        <span title="Компактная строка прогресса в правом нижнем углу: сколько страниц готово, скорость, пауза">Нижняя мини-панель статуса</span>
+        <input type="checkbox" id="showBadge" checked>
+      </div>
+      <div class="range-row">
+        <div class="row">
+          <span style="font-size:12px;" title="Увеличивает или уменьшает размер русского текста внутри облачков">Размер шрифта</span>
+          <span id="fontScaleVal" style="font-size:12px; color:#38bdf8;">100%</span>
+        </div>
+        <input type="range" id="fontScale" min="0.8" max="1.25" step="0.05" value="1.0">
+      </div>
+      <div class="btn-row" style="margin-top: 9px;">
+        <button class="btn-secondary" id="retranslateBtn" title="Очищает сохранённый кэш и заново переводит открытую главу">Перевести заново (сброс кэша)</button>
+      </div>
+    </div>
+
+    <div class="hotkeys">
+      <kbd>Alt+S</kbd> область • <kbd>Alt+T</kbd> сайт вкл/выкл • <kbd>Alt+H</kbd> оригинал
+    </div>
+  </div>
+
+  <!-- ==================== BUILT-IN COMPACT GUIDE ==================== -->
+  <div id="guideView">
+    <div class="guide-topbar">
+      <button type="button" class="btn-back" id="closeGuideBtn">← Назад</button>
+      <div class="guide-heading">Гайд и описание функций</div>
+    </div>
+
+    <details class="guide-acc" open>
+      <summary>🚀 Быстрый старт (настройка за 1 минуту)</summary>
+      <div class="guide-body">
+        <ol>
+          <li>Нажмите ссылку <strong>«Получить бесплатный ключ (Google AI Studio)»</strong> на главном экране (откроется официальный сайт Google, банковская карта не нужна).</li>
+          <li>Войдите через Google-аккаунт, нажмите <strong>Create API key</strong> и скопируйте ключ.</li>
+          <li>Вставьте ключ в поле в расширении и нажмите <strong>«Сохранить и проверить»</strong> — появится зелёная надпись <em>«Работает!»</em>.</li>
+          <li>Откройте любую главу манги/манхвы на английском, нажмите на иконку расширения и включите тумблер <strong>«Автоперевод этого сайта»</strong>.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="guide-acc">
+      <summary>⚙️ Что делает каждая кнопка и настройка</summary>
+      <div class="guide-body">
+        <div class="guide-item">
+          <b>✂ Обрезать и перевести область</b>
+          Выделяете мышкой любой кусочек экрана — расширение вырезает только его и за 1–2 секунды накладывает русский перевод прямо поверх. Работает даже там, где автоперевод выключен.
+        </div>
+        <div class="guide-item">
+          <b>Автоперевод этого сайта</b>
+          Включает перевод только для открытого сейчас сайта. На YouTube, в соцсетях и на других вкладках расширение вообще не запускается и не тратит ресурсы.
+        </div>
+        <div class="guide-item">
+          <b>Нейросеть</b>
+          <strong>Flash-Lite</strong> — отвечает быстрее всех (1–2 сек), идеально для комфортного чтения. Обычная <strong>Flash</strong> — чуть медленнее, но слог немного богаче.
+        </div>
+        <div class="guide-item">
+          <b>🚀 Переводить всю главу заранее в фоне</b>
+          Пока вы читаете 1-ю страницу, расширение заранее переводит все остальные страницы главы до конца. Когда дойдёте вниз — перевод уже будет готов.
+        </div>
+        <div class="guide-item">
+          <b>⚡ Пакетный турбо-режим (3–4 стр. за 1 запрос)</b>
+          Отправляет сразу несколько страниц за 1 обращение к нейросети. Экономит бесплатный лимит в 4 раза и защищает от пауз.
+        </div>
+        <div class="guide-item">
+          <b>✂ Боковая кнопка справа на экране</b>
+          Маленькая полупрозрачная кнопка сбоку: в ней лежат <em>«Обрезать область»</em>, <em>«Доперевести экран»</em>, <em>«Скрыть перевод»</em> и <em>«Убрать вырезки»</em>.
+        </div>
+        <div class="guide-item">
+          <b>Пропускать только звуки (SFX)</b>
+          Не трогает рисованные шумы вроде <em>BOOM / KRRACK</em>, но переводит все диалоги, крики (<em>IMPOSSIBLE!</em>), мысли и системные окна.
+        </div>
+        <div class="guide-item">
+          <b>Мягкие края баблов и Размер шрифта</b>
+          Смягчают переход плашек в фон облачка и позволяют сделать русский шрифт крупнее или мельче под свой монитор.
+        </div>
+        <div class="guide-item">
+          <b>Нижняя мини-панель статуса</b>
+          Показывает прогресс всей главы (например, <em>Глава: 12/21 • 1.4с</em>), а также быстрые кнопки <em>Пауза</em> и <em>Скрыть</em>.
+        </div>
+        <div class="guide-item">
+          <b>Перевести заново (сброс кэша)</b>
+          Прочитанные главы сохраняются в памяти браузера (при F5 тратится 0 запросов). Эта кнопка сбрасывает кэш и переводит главу с нуля.
+        </div>
+      </div>
+    </details>
+
+    <details class="guide-acc">
+      <summary>🔑 Бесплатные лимиты и несколько ключей</summary>
+      <div class="guide-body">
+        <ul>
+          <li>Один бесплатный ключ Google даёт <strong>500 запросов в сутки</strong>. В пакетном режиме этого хватает примерно на <strong>65–80 полных глав в день</strong>.</li>
+          <li>Если читаете очень много — можно создать бесплатные ключи на 2–3 Google-аккаунтах и вставить их в поле <strong>каждый с новой строки</strong>. Расширение само будет переключаться между ними.</li>
+          <li>Если на одной модели закончился дневной лимит, расширение само переключится на другую свободную модель.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="guide-acc">
+      <summary>⌨️ Горячие клавиши и управление</summary>
+      <div class="guide-body">
+        <ul>
+          <li><kbd>Alt + S</kbd> — выделить мышкой любую область и мгновенно перевести (работает на любом сайте).</li>
+          <li><kbd>Alt + H</kbd> — быстро скрыть или вернуть весь перевод на странице.</li>
+          <li><kbd>Alt + T</kbd> — включить/выключить автоперевод текущего сайта.</li>
+          <li><strong>Клик по любому переведённому баблу</strong> — временно делает его прозрачным, чтобы посмотреть английский оригинал.</li>
+          <li><strong>Навести на вырезку ✂ и нажать ×</strong> — удалить ручной перевод области.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="guide-acc">
+      <summary>🛡 Безопасность (почему нет вирусов)</summary>
+      <div class="guide-body">
+        <div class="safe-box">
+          <strong>100% открытый исходный код:</strong>
+          <ul>
+            <li>Ваши API-ключи хранятся <strong>только локально</strong> в вашем браузере и никому не передаются.</li>
+            <li>Расширение не использует сторонние серверы, не собирает статистику и не вставляет рекламу.</li>
+            <li>Картинки отправляются напрямую из вашего браузера в официальный API Google (<code>generativelanguage.googleapis.com</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
